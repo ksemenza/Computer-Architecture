@@ -2,11 +2,36 @@
 
 import sys
 
+""" 
+#TODO LDI: Load Immediately, store values to register OR set register to values
+ loading puts into a particular defined register to a specific value defined instructions
+ 
+#TODO PRN: Print, a pseudo=instruction (to print register numeric value )
+Raw print file created by a "print to file" 
+
+
+#TODO HLT: Halt, CPU and exits emulator
+Assembly language instructions to stop if system enters an idle state
+Does not continue until the next external interrput is fired
+
+"""
+
 class CPU:
     """Main CPU class."""
-
+#TODO Constants
+    LDI = 0b10000010
+    HLT = 0b00000001
+    PRN = 0b01000111
+    
+    
     def __init__(self):
         """Construct a new CPU."""
+#TODO Implement CPU Constructor
+        self.ram = [0] * 256
+        self.register = [0] * 8
+        self.pc = 0
+#TODO Running state
+        self.running = True
         pass
 
     def load(self):
@@ -35,7 +60,7 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
+            self.register[reg_a] += self.register[reg_b]
         #elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
@@ -56,10 +81,34 @@ class CPU:
         ), end='')
 
         for i in range(8):
-            print(" %02X" % self.reg[i], end='')
+            print(" %02X" % self.register[i], end='')
 
         print()
 
+#TODO initate running 
     def run(self):
-        """Run the CPU."""
-        pass
+        while self.running:
+            reg_instructor = self.ram_read(self.pc)
+            if reg_instructor == self.LDI:
+                register_num = self.ram_read(self.pc + 1)
+                value = self.ram_read(self.pc + 2)
+                self.ram_write(register_num, value)
+                self.pc += 3
+            elif reg_instructor == self.HLT:
+                self.running = False
+            elif reg_instructor == self.PRN:
+                register_num = self.ram[self.pc + 1]
+                print(self.ram[register_num])
+                self.pc += 2
+            else:
+                print(f'Error: Instruction {reg_instructor} at address {self.pc}')
+                sys.exit(1)
+
+#TODO Add read/write RAM functions
+    #2-1 create ram_read 
+    def ram_read(self, address):
+        return self.ram[address]
+    
+    #2-2 create ram_write
+    def ram_write(self, address, value):
+        self.ram[address] = value
