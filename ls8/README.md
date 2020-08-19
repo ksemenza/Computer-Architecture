@@ -26,6 +26,7 @@ then prints it out:
 01000111 # PRN R0
 00000000
 00000001 # HLT
+
 ```
 
 The binary numeric value on the left in the `print8.ls8` code above is either:
